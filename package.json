@@ -3,10 +3,10 @@
   "private": true,
   "type": "module",
   "version": "0.0.0",
-  "homepage": "https://vornone.github.io/ao_construction_cost",
+  "homepage": "https://vornone.github.io/ao_construction_cost/",
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
@@ -21,7 +21,6 @@
     "test": "npm run typecheck && npm run prettier && npm run lint && npm run vitest && npm run build",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
-
   },
   "dependencies": {
     "@mantine/core": "7.15.2",

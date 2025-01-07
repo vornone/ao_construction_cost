@@ -4,9 +4,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
-  build: {
-    outDir: 'build', // Default is 'dist', but ensure it's set correctly
-  },
+  base: '/ao_construction_cost/',
   test: {
     globals: true,
     environment: 'jsdom',

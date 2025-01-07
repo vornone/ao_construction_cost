@@ -7,9 +7,7 @@ const router = createBrowserRouter([
     element: <HomePage />,
   },
 ], {
-  basename: process.env.NODE_ENV === 'production' 
-    ? '/ao_construction_cost'  // Replace with your repository name
-    : '/'
+  basename: '/ao_construction_cost'  // Always use this basename
 });
 
 export function Router() {
