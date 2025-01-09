@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Stack, Text, NumberInput, CloseButton, TextInput, Flex, Button, Fieldset, SegmentedControl, Alert, Notification } from "@mantine/core";
+import { Stack, Text, NumberInput, CloseButton, TextInput, Flex, Button, Fieldset, SegmentedControl, Alert, Notification, Tooltip, HoverCard, ThemeIcon } from "@mantine/core";
 import { Select } from "@mantine/core";
-import { TbUser, TbBuilding } from "react-icons/tb";
+import { TbUser, TbBuilding, TbArrowRight } from "react-icons/tb";
 import { MdEuro } from "react-icons/md";
 import { FaDollarSign, FaPoundSign, FaEuroSign, FaCheck, FaTimes } from "react-icons/fa";
 import { toast , ToastContainer} from "react-toastify";
+import { TbAlertCircle } from "react-icons/tb";
+import { Formular } from "@/forumlar";
+
+
+const formularInstance = new Formular();
 interface FormValues {
   plotWidth: number;
   plotLength: number;
@@ -29,6 +34,8 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showNotification, setShowNotification] = useState(false);
+
+
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -59,6 +66,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     const totalCost = siteCost + designCost + materialCost;
     const euroValue= 1.2
     const poundValue= 0.75
+    
 
     if(values.currency === "EUR"){
       return {
@@ -159,6 +167,12 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     )
   }
 
+  const constructionParams = {
+    buildingWidth: values.plotWidth,
+    buildingLength: values.plotLength,
+    buildingFloor: values.noOfFloors,
+    constructionRate: 1,
+  }
   return (
     <Stack w="100%" align="center">
       <ToastContainer />
@@ -232,6 +246,11 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           ]}
         />
         <TextInput
+          label="Plot Cost"
+          value={formularInstance.calculateArea(constructionParams)}
+          readOnly
+        />
+        <TextInput
           label="Site Cost"
           value={formatCurrency(calculated.siteCost)}
           readOnly
@@ -254,16 +273,33 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           value={formatCurrency(calculated.totalCost)}
           readOnly
         />
-        <Flex gap="md" direction={'row-reverse'}>
+        <Flex gap="md" direction={'row-reverse'} align={"center"}>
+
           <Button 
             size="md"
             onClick={submitToGoogleSheets}
             loading={isSubmitting}
             disabled={isSubmitting}
-            color="blue.9"
+          
+            variant="gradient"
+            gradient={{ from: 'blue', to: 'indigo', deg: 45 }}
+            rightSection={<TbArrowRight />}
           >
             Submit
           </Button>
+          <HoverCard width={isMobile? '50%': '20%'} shadow="md" withArrow>
+            <HoverCard.Target>
+              <ThemeIcon size="xl" variant="outline" color="blue.9" bd={0}>
+                <TbAlertCircle size={30} />
+              </ThemeIcon>
+            </HoverCard.Target>
+            <HoverCard.Dropdown>
+              <Text size="sm" fw={700}>Note:</Text>
+              <Text size="sm" >
+                you do not have to submit them, however it will help us with our data analytic on construction cost.
+              </Text>
+            </HoverCard.Dropdown>
+          </HoverCard>  
         </Flex>
         {submitError && (
           <Text color="red" size="sm">

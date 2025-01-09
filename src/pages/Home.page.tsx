@@ -1,6 +1,6 @@
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { Welcome } from '../components/Welcome/Welcome';
-import { AppShell, Burger, Flex, Input, Stack,Center } from '@mantine/core';
+import { AppShell, Burger, Flex, Input, Stack,Center, Image, BackgroundImage } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Text } from '@mantine/core';
 import ConstructionCostForm from '@/components/ConstructionCostForm/ConstructionCostForm';
@@ -26,14 +26,23 @@ export function HomePage() {
           hiddenFrom="sm"
           size="sm"
         />
+        {/* <Image 
+        style={{'--svg-fill-color': 'var(--mantine-color-blue)'}}
+          src="./src/assets/logo/AO_Construction_cost_logo_trim-01.svg" 
+          width={isMobile ? 30 : 40}
+          height={isMobile ? 30 : 40}
+          alt="AO Construction Cost Logo"
+        /> */}
+
         <Text size="xl" fw={700}>AO Construction Cost  </Text>
         <ColorSchemeToggle /></Flex>
 
       </AppShell.Header>
 
-      <AppShell.Navbar p="md" >Navbar</AppShell.Navbar>
-
+      <AppShell.Navbar p="md" >Coming Soon</AppShell.Navbar>
+          
       <AppShell.Main>
+        <BackgroundImage src="./src/assets/heroImage.jpg" style={{width: '100%', height: '100%'}}></BackgroundImage>
         <Center><Welcome isMobile={isMobile}></Welcome></Center>
         <ConstructionCostForm isMobile={isMobile}></ConstructionCostForm>
       </AppShell.Main>
