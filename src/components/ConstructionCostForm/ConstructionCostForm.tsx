@@ -6,16 +6,23 @@ import { MdEuro } from "react-icons/md";
 import { FaDollarSign, FaPoundSign, FaEuroSign, FaCheck, FaTimes } from "react-icons/fa";
 import { toast , ToastContainer} from "react-toastify";
 import { TbAlertCircle } from "react-icons/tb";
-import { Formular } from "@/forumlar";
+import { DesignCost, TotalCost, ConstructionCost } from "../../forumlar";
+import { MdDesignServices,MdConstruction } from "react-icons/md";
+import { FaMoneyBills } from "react-icons/fa6";
 
 
-const formularInstance = new Formular();
+
+const designCost = new DesignCost();
+const constructionCost = new ConstructionCost();
+const totalCost = new TotalCost();
+
 interface FormValues {
   plotWidth: number;
   plotLength: number;
   noOfFloors: number;
   currency: string;
   unit: string;
+  constructionRate: number;
 }
 
 interface CalculatedValues {
@@ -29,12 +36,42 @@ interface UserInput {
   email: string;
   phoneNumber: string;
 }
+interface CalculatedObject{
+  grossFloorArea: number;
+  totalConstructionCost: number;
+  structureCost: number;
+  archiCost: number;
+  MEPcost: number;
+  totalDesignCost: number;
+  engineerCost: number;
+  designMEPCost: number;
+  totalDesignBuild: number;
+  fullBudgetDesignBuild: number;
+  permitFee: number;
+  contingencyCashReserve: number;
+  finalConstructionCost: number;
+}
 
 function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showNotification, setShowNotification] = useState(false);
-
+  const [showResults, setShowResults] = useState(false);
+  const [calculatedValues, setCalculatedValues] = useState<CalculatedObject>({
+    grossFloorArea: 0,
+    totalConstructionCost: 0,
+    structureCost: 0,
+    archiCost: 0,
+    MEPcost: 0,
+    totalDesignCost: 0,
+    engineerCost: 0,
+    designMEPCost: 0,
+    totalDesignBuild: 0,
+    fullBudgetDesignBuild: 0,
+    permitFee: 0,
+    contingencyCashReserve: 0,
+    finalConstructionCost: 0,
+  });
 
 
   const formatCurrency = (value: number) => {
@@ -51,7 +88,8 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     plotLength: 0,
     noOfFloors: 0,
     currency: "USD",
-    unit: "Feet",
+    unit: "Meter",
+    constructionRate: 450,
   });
 
   const [userInput, setUserInput] = useState<UserInput>({
@@ -59,38 +97,8 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     phoneNumber: "",
   });
 
-  const calculateValues = (): CalculatedValues => {
-    const siteCost = values.plotWidth * values.plotLength * values.noOfFloors;
-    const designCost = siteCost * 0.1;
-    const materialCost = siteCost * 0.5;
-    const totalCost = siteCost + designCost + materialCost;
-    const euroValue= 1.2
-    const poundValue= 0.75
-    
 
-    if(values.currency === "EUR"){
-      return {
-        siteCost: siteCost * euroValue,
-        designCost: designCost * euroValue,
-        materialCost: materialCost * euroValue,
-        totalCost: totalCost * euroValue,
-      }
-    }
-    if(values.currency === "GBP"){
-      return {
-        siteCost: siteCost * poundValue,
-        designCost: designCost * poundValue,
-        materialCost: materialCost * poundValue,
-        totalCost: totalCost * poundValue
-      }
-    }
-    return {
-      siteCost,
-      designCost,
-      materialCost,
-      totalCost,
-    };
-  };
+
 
   const handleNumberChange = (field: keyof FormValues, value: number | null) => {
     setValues((prevValues) => ({
@@ -113,12 +121,69 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     }));
   };
 
+ 
+  const fields = [
+    { label: "Plot Width", name: "plotWidth" as const },
+    { label: "Plot Length", name: "plotLength" as const },
+    { label: "No. of Floors", name: "noOfFloors" as const },
+  ];
+
+  const currencyList = ["USD", "EUR", "GBP"];
+  const unit = ["Meter", "Feet"];
+
+
+  const fieldLegend = (icon: React.ReactNode, Title: string) => {
+    return (
+      <Flex align="center" gap={10}>{icon} <Text size="sm" fw={700}>{Title}</Text></Flex>
+    )
+  }
+
+  const constructionParams = {
+    buildingWidth: values.plotWidth,
+    buildingLength: values.plotLength,
+    buildingFloor: values.noOfFloors,
+    constructionRate: values.constructionRate,
+  }
+
+  const calculatioConstructionCost = ()=> {
+    const grossFloorArea = constructionCost.calculateArea(constructionParams);
+    //construction Cost
+    const totalConstructionCost = constructionCost.calculateTotalCost(constructionParams);
+    const structureCost = constructionCost.calculateStructureCost(totalConstructionCost);
+    const archiCost = constructionCost.calculateArchiCost(totalConstructionCost);
+    const MEPcost = constructionCost.calculateMEPCost(totalConstructionCost);
+    //Design Cost
+    const totalDesignCost = designCost.calculateDesignCost(totalConstructionCost);
+    const engineerCost = designCost.calculateEngineerCost(totalConstructionCost);
+    const designMEPCost = designCost.calculateMEPCost(totalConstructionCost);
+    const totalDesignBuild = designCost.totalDesignCost(totalDesignCost, engineerCost, designMEPCost);
+    //Total Cost
+    const fullBudgetDesignBuild= totalCost.fullBudgetDesignBuild(totalConstructionCost, totalDesignBuild);
+    const permitFee = totalCost.permitFee(fullBudgetDesignBuild);
+    const contingencyCashReserve = totalCost.contingencyCashReserve(fullBudgetDesignBuild);
+    const finalConstructionCost = fullBudgetDesignBuild+ permitFee + contingencyCashReserve;
+
+    return {
+      grossFloorArea,
+      totalConstructionCost,
+      structureCost,
+      archiCost,
+      MEPcost,
+      totalDesignCost,
+      engineerCost,
+      designMEPCost,
+      totalDesignBuild,
+      fullBudgetDesignBuild,
+      permitFee,
+      contingencyCashReserve,
+      finalConstructionCost,
+    }
+  }
   const submitToGoogleSheets = async () => {
     try {
       setIsSubmitting(true);
       setSubmitError(null);
-      
-      const calculated = calculateValues();
+      const calculated = calculatioConstructionCost();
       const timestamp = new Date().toISOString();
       
       const formData = {
@@ -151,28 +216,23 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     }
   };
 
-  const fields = [
-    { label: "Plot Width", name: "plotWidth" as const },
-    { label: "Plot Length", name: "plotLength" as const },
-    { label: "No. of Floors", name: "noOfFloors" as const },
-  ];
-
-  const currencyList = ["USD", "EUR", "GBP"];
-  const unit = ["Feet", "Meter"];
-  const calculated = calculateValues();
-
-  const fieldLegend = (icon: React.ReactNode, Title: string) => {
-    return (
-      <Flex align="center" gap={10}>{icon} <Text size="sm" fw={700}>{Title}</Text></Flex>
-    )
-  }
-
-  const constructionParams = {
-    buildingWidth: values.plotWidth,
-    buildingLength: values.plotLength,
-    buildingFloor: values.noOfFloors,
-    constructionRate: 1,
-  }
+  const handleCalculate = () => {
+    setShowResults(false);
+    setIsSubmitting(true);
+    try {
+      const result = calculatioConstructionCost();
+      setTimeout(() => {
+        setShowResults(true);
+        setIsSubmitting(false);
+        setCalculatedValues(result);
+      }, 2000);
+    } catch (error) {
+      console.error("Error during calculation:", error);
+      setIsSubmitting(false);
+    }
+  };
+  
+  const calculated = calculatioConstructionCost();
   return (
     <Stack w="100%" align="center">
       <ToastContainer />
@@ -233,6 +293,38 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             />
           ))}
         </Fieldset>
+        <Flex gap="md" direction={'row-reverse'} align={"center"}>
+
+<Button 
+  size="md"
+  onClick={handleCalculate}
+  loading={isSubmitting}
+  disabled={isSubmitting}
+
+  variant="outline"
+  rightSection={<TbArrowRight />}
+>
+  Calculate
+</Button>
+{/* <HoverCard width={isMobile? '50%': '20%'} shadow="md" withArrow>
+  <HoverCard.Target>
+    <ThemeIcon size="xl" variant="outline" color="blue.9" bd={0}>
+      <TbAlertCircle size={30} />
+    </ThemeIcon>
+  </HoverCard.Target>
+  <HoverCard.Dropdown>
+    <Text size="sm" fw={700}>Note:</Text>
+    <Text size="sm" >
+      you do not have to submit them, however it will help us with our data analytic on construction cost.
+    </Text>
+  </HoverCard.Dropdown>
+</HoverCard>   */}
+</Flex>
+{submitError && (
+<Text color="red" size="sm">
+  Error: {submitError}
+</Text>
+)}
         <Text size="xl" fw={700}>
           Calculation Cost
         </Text>
@@ -245,67 +337,89 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             { label: (<Flex align={'center'} justify={'center'} gap={5}><FaPoundSign /><Text>GBP</Text></Flex>), value: 'GBP' },
           ]}
         />
-        <TextInput
-          label="Plot Cost"
-          value={formularInstance.calculateArea(constructionParams)}
+        <NumberInput
+          label="Gross Floor Area"
+          value={calculatedValues.grossFloorArea}
           readOnly
+          suffix={values.unit === 'Feet' ? ' sqft' : ' sqm'}
+        
         />
+        <Fieldset legend={fieldLegend(<MdConstruction />, "Construction Cost")}>
+          <TextInput
+            label="Estimate Structure Cost(≈30% of ECC)"
+            value={formatCurrency(calculatedValues.structureCost)}
+            readOnly
+          />
+          <TextInput
+            label="Estimate Architecture Work & Interior Finishes Cost (≈50% of ECC)"
+            value={formatCurrency(calculatedValues.archiCost)}
+            readOnly
+          />
+          <TextInput
+            label="Estimate MEP Cost (≈20% of ECC)"
+            value={formatCurrency(calculatedValues.MEPcost)}
+            readOnly
+          />
+          <TextInput
+          fw={800}
+          variant="unstyled"
+            label="Estimate Construction Cost (ECC)"
+            value={formatCurrency(calculatedValues.totalConstructionCost)}
+            readOnly
+          />
+          </Fieldset>
+          <Fieldset legend={fieldLegend(<MdDesignServices />, "Design Cost")}>
+          <TextInput
+            label="Building Design Cost (7% of ECC)"
+            value={formatCurrency(calculatedValues.totalDesignCost)}
+            readOnly
+          />
+        
+          <TextInput
+            label="Engineering Design Fee (4% of ECC)"
+            value={formatCurrency(calculatedValues.engineerCost)}
+            readOnly
+          />
+          <TextInput
+            label="Estimate Architectural Design Fee (2% of ECC)"
+            value={formatCurrency(calculatedValues.designMEPCost)}
+            readOnly
+          />
+          <TextInput
+            label="Total Design Cost"
+            fw={800}
+            variant="unstyled"
+            value={formatCurrency(calculatedValues.totalDesignBuild)}
+            readOnly
+          />
+          </Fieldset>
+          <Fieldset legend={fieldLegend(<FaMoneyBills />, "Estimated Budget for Full Design and Build")}>
+          <TextInput
+            label="Full Budget Design and Build"
+            value={formatCurrency(calculatedValues.fullBudgetDesignBuild)}
+            readOnly
+          />
+          <TextInput
+            label="Permit Fee, Licences Fee, Admisnistration & Insurance"
+            value={formatCurrency(calculatedValues.permitFee)}
+            readOnly
+          />
+          <TextInput
+            label="Contingency Cash Reserve"
+            value={formatCurrency(calculatedValues.contingencyCashReserve)}
+            readOnly
+          />
+
+          </Fieldset>
         <TextInput
-          label="Site Cost"
-          value={formatCurrency(calculated.siteCost)}
-          readOnly
-        />
-        <TextInput
-          label="Design Cost (10%)"
-          value={formatCurrency(calculated.designCost)}
-          readOnly
-        />
-        <TextInput
-          label="Material Cost (50%)"
-          value={formatCurrency(calculated.materialCost)}
-          readOnly
-        />
-        <TextInput
-          label="Total Cost"
+          label="Total Project Cost"
           size="xl"
           fw={800}
           variant="unstyled"
-          value={formatCurrency(calculated.totalCost)}
+          value={"≈ " + formatCurrency(calculatedValues.finalConstructionCost)}
           readOnly
         />
-        <Flex gap="md" direction={'row-reverse'} align={"center"}>
-
-          <Button 
-            size="md"
-            onClick={submitToGoogleSheets}
-            loading={isSubmitting}
-            disabled={isSubmitting}
-          
-            variant="gradient"
-            gradient={{ from: 'blue', to: 'indigo', deg: 45 }}
-            rightSection={<TbArrowRight />}
-          >
-            Submit
-          </Button>
-          <HoverCard width={isMobile? '50%': '20%'} shadow="md" withArrow>
-            <HoverCard.Target>
-              <ThemeIcon size="xl" variant="outline" color="blue.9" bd={0}>
-                <TbAlertCircle size={30} />
-              </ThemeIcon>
-            </HoverCard.Target>
-            <HoverCard.Dropdown>
-              <Text size="sm" fw={700}>Note:</Text>
-              <Text size="sm" >
-                you do not have to submit them, however it will help us with our data analytic on construction cost.
-              </Text>
-            </HoverCard.Dropdown>
-          </HoverCard>  
-        </Flex>
-        {submitError && (
-          <Text color="red" size="sm">
-            Error: {submitError}
-          </Text>
-        )}
+ 
       </Stack>
 
     </Stack>
