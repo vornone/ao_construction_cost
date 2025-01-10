@@ -41,7 +41,7 @@ interface CalculatedObject{
   totalConstructionCost: number;
   structureCost: number;
   archiCost: number;
-  MEPcost: number;
+  MEPCost: number;
   totalDesignCost: number;
   engineerCost: number;
   designMEPCost: number;
@@ -62,7 +62,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     totalConstructionCost: 0,
     structureCost: 0,
     archiCost: 0,
-    MEPcost: 0,
+    MEPCost: 0,
     totalDesignCost: 0,
     engineerCost: 0,
     designMEPCost: 0,
@@ -151,7 +151,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     const totalConstructionCost = constructionCost.calculateTotalCost(constructionParams);
     const structureCost = constructionCost.calculateStructureCost(totalConstructionCost);
     const archiCost = constructionCost.calculateArchiCost(totalConstructionCost);
-    const MEPcost = constructionCost.calculateMEPCost(totalConstructionCost);
+    const MEPCost = constructionCost.calculateMEPCost(totalConstructionCost);
     //Design Cost
     const totalDesignCost = designCost.calculateDesignCost(totalConstructionCost);
     const engineerCost = designCost.calculateEngineerCost(totalConstructionCost);
@@ -168,7 +168,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
       totalConstructionCost,
       structureCost,
       archiCost,
-      MEPcost,
+      MEPCost,
       totalDesignCost,
       engineerCost,
       designMEPCost,
@@ -357,7 +357,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           />
           <TextInput
             label="Estimate MEP Cost (≈20% of ECC)"
-            value={formatCurrency(calculatedValues.MEPcost)}
+            value={formatCurrency(calculatedValues.MEPCost)}
             readOnly
           />
           <TextInput

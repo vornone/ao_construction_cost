@@ -15,7 +15,7 @@ export class ConstructionCost {
     }
     
     calculateStructureCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.7;
+        return constructionTotalCost * 0.3;
     }
     calculateArchiCost(constructionTotalCost: number) {
         return constructionTotalCost * 0.5;
