@@ -1,4 +1,4 @@
-import { Anchor, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Image, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import classes from './Welcome.module.css';
 
 interface Props {
@@ -11,8 +11,8 @@ export function Welcome({ isMobile }: Props) {
       <Title className={classes.title} ta="center" mt={'xl'}>
         Welcome to{' '}
         <br/> 
-        <Text inherit variant="gradient" component="span" gradient={{ from: 'blue', to: 'indigo' }}>
-          AO Construction Cost
+        <Text inherit variant="gradient" component="span" gradient={{ from: 'orange', to: 'yellow.1' }}>
+          Keha Home
         </Text>
       </Title>
 

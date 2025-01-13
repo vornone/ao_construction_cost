@@ -15,10 +15,13 @@ export class ConstructionCost {
     }
     
     calculateStructureCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.7;
+        return constructionTotalCost * 0.3;
     }
     calculateArchiCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.5;
+        return constructionTotalCost * 0.3;
+    }
+    calculateInteriorCost(constructionTotalCost: number) {
+        return constructionTotalCost * 0.2;
     }
     calculateMEPCost(constructionTotalCost: number) {
         return constructionTotalCost * 0.2;
@@ -27,7 +30,7 @@ export class ConstructionCost {
 
 export class DesignCost{
     calculateDesignCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.07;
+        return constructionTotalCost * 0.03;
     }
     calculateEngineerCost(constructionTotalCost: number) {
         return constructionTotalCost * 0.04;

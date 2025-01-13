@@ -34,7 +34,7 @@ export function HomePage() {
           alt="AO Construction Cost Logo"
         /> */}
 
-        <Text size="xl" fw={700}>AO Construction Cost  </Text>
+        <Text size="xl" fw={700}>Keha Home </Text>
         <ColorSchemeToggle /></Flex>
 
       </AppShell.Header>

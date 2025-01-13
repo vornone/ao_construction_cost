@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Stack, Text, NumberInput, CloseButton, TextInput, Flex, Button, Fieldset, SegmentedControl, Alert, Notification, Tooltip, HoverCard, ThemeIcon } from "@mantine/core";
+import { Stack, Text, NumberInput, CloseButton, TextInput, Flex, Button, Fieldset, SegmentedControl, Alert, Notification, Tooltip, HoverCard, ThemeIcon, Autocomplete } from "@mantine/core";
 import { Select } from "@mantine/core";
-import { TbUser, TbBuilding, TbArrowRight } from "react-icons/tb";
+import { TbUser, TbBuilding, TbArrowRight, TbArrowDown } from "react-icons/tb";
 import { MdEuro } from "react-icons/md";
 import { FaDollarSign, FaPoundSign, FaEuroSign, FaCheck, FaTimes } from "react-icons/fa";
 import { toast , ToastContainer} from "react-toastify";
@@ -9,7 +9,7 @@ import { TbAlertCircle } from "react-icons/tb";
 import { DesignCost, TotalCost, ConstructionCost } from "../../forumlar";
 import { MdDesignServices,MdConstruction } from "react-icons/md";
 import { FaMoneyBills } from "react-icons/fa6";
-
+import NumberSelector from './../NumberSelector/NumberSelector';
 
 
 const designCost = new DesignCost();
@@ -22,7 +22,7 @@ interface FormValues {
   noOfFloors: number;
   currency: string;
   unit: string;
-  constructionRate: number;
+  constructionRate: "";
 }
 
 interface CalculatedValues {
@@ -41,6 +41,7 @@ interface CalculatedObject{
   totalConstructionCost: number;
   structureCost: number;
   archiCost: number;
+  interiorCost: number;
   MEPcost: number;
   totalDesignCost: number;
   engineerCost: number;
@@ -57,11 +58,29 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showNotification, setShowNotification] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [rate, setRate] = useState(0);
+  const [invalidInput, setInvalidInput] = useState(false);
+  const [values, setValues] = useState<FormValues>({
+    plotWidth: 0,
+    plotLength: 0,
+    noOfFloors: 0,
+    currency: "USD",
+    unit: "Meter",
+    constructionRate: "",
+  });
+
+  const [userInput, setUserInput] = useState<UserInput>({
+    email: "",
+    phoneNumber: "",
+  });
+
+
   const [calculatedValues, setCalculatedValues] = useState<CalculatedObject>({
     grossFloorArea: 0,
     totalConstructionCost: 0,
     structureCost: 0,
     archiCost: 0,
+    interiorCost: 0,
     MEPcost: 0,
     totalDesignCost: 0,
     engineerCost: 0,
@@ -73,6 +92,19 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     finalConstructionCost: 0,
   });
 
+  useEffect(() => {
+    if (values.constructionRate !== "" && values.constructionRate === "$600 (Good Rate)") {
+      setRate(600);
+    } else if (values.constructionRate !== "" && values.constructionRate === "$450 (Normal Rate)") {
+      setRate(450);
+    } else if (values.constructionRate !== "" && values.constructionRate === "$750 (Excellent Rate)") {
+      setRate(750);
+    }else if (!isNaN(Number(values.constructionRate))) {
+      setRate(Number(values.constructionRate));
+    }else if (!isNaN(Number(values.constructionRate)) && values.constructionRate !== "") {
+      setRate(0);
+    }
+  }, [values]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -82,23 +114,6 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
       maximumFractionDigits: 2,
     }).format(value);
   };
-
-  const [values, setValues] = useState<FormValues>({
-    plotWidth: 0,
-    plotLength: 0,
-    noOfFloors: 0,
-    currency: "USD",
-    unit: "Meter",
-    constructionRate: 450,
-  });
-
-  const [userInput, setUserInput] = useState<UserInput>({
-    email: "",
-    phoneNumber: "",
-  });
-
-
-
 
   const handleNumberChange = (field: keyof FormValues, value: number | null) => {
     setValues((prevValues) => ({
@@ -112,8 +127,11 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
       ...prevValues,
       [field]: value ?? prevValues[field],
     }));
+  
   };
-
+  useEffect(() => {
+    console.log(values);
+  }, [values]);
   const handleReset = (field: keyof FormValues) => {
     setValues((prevValues) => ({
       ...prevValues,
@@ -123,8 +141,8 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
 
  
   const fields = [
-    { label: "Plot Width", name: "plotWidth" as const },
-    { label: "Plot Length", name: "plotLength" as const },
+    { label: "Building Width", name: "plotWidth" as const },
+    { label: "Building Length", name: "plotLength" as const },
     { label: "No. of Floors", name: "noOfFloors" as const },
   ];
 
@@ -142,7 +160,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     buildingWidth: values.plotWidth,
     buildingLength: values.plotLength,
     buildingFloor: values.noOfFloors,
-    constructionRate: values.constructionRate,
+    constructionRate: rate ,
   }
 
   const calculatioConstructionCost = ()=> {
@@ -151,6 +169,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     const totalConstructionCost = constructionCost.calculateTotalCost(constructionParams);
     const structureCost = constructionCost.calculateStructureCost(totalConstructionCost);
     const archiCost = constructionCost.calculateArchiCost(totalConstructionCost);
+    const interiorCost = constructionCost.calculateInteriorCost(totalConstructionCost);
     const MEPcost = constructionCost.calculateMEPCost(totalConstructionCost);
     //Design Cost
     const totalDesignCost = designCost.calculateDesignCost(totalConstructionCost);
@@ -168,6 +187,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
       totalConstructionCost,
       structureCost,
       archiCost,
+      interiorCost,
       MEPcost,
       totalDesignCost,
       engineerCost,
@@ -217,18 +237,25 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   };
 
   const handleCalculate = () => {
-    setShowResults(false);
-    setIsSubmitting(true);
-    try {
-      const result = calculatioConstructionCost();
-      setTimeout(() => {
-        setShowResults(true);
+    if(values.noOfFloors <=0 || values.plotWidth <=0 || values.plotLength <=0 || rate <450) {
+      toast.error('Please fill in all the required fields.');
+      setInvalidInput(true);
+      
+    }
+    else {
+      setShowResults(false);
+      setIsSubmitting(true);
+      try {
+        const result = calculatioConstructionCost();
+        setTimeout(() => {
+          setShowResults(true);
+          setIsSubmitting(false);
+          setCalculatedValues(result);
+        }, 2000);
+      } catch (error) {
+        console.error("Error during calculation:", error);
         setIsSubmitting(false);
-        setCalculatedValues(result);
-      }, 2000);
-    } catch (error) {
-      console.error("Error during calculation:", error);
-      setIsSubmitting(false);
+      }
     }
   };
   
@@ -236,7 +263,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   return (
     <Stack w="100%" align="center">
       <ToastContainer />
-      <Stack w={isMobile ? '100%' : '50%'} pos="relative">
+      <Stack w={isMobile ? '100%' : '60%'} pos="relative">
         {showNotification && (
           <Notification
             title="Success"
@@ -263,6 +290,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
         </Text>
         <Fieldset legend={fieldLegend(<TbUser />, "Enter User Details (optional)")}>
           <TextInput
+    
             label="Email"
             placeholder="Enter Email"
             value={userInput.email}
@@ -275,9 +303,11 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             onChange={(event) => setUserInput({ ...userInput, phoneNumber: event.target.value })}
           />
         </Fieldset>
-        <Fieldset legend={fieldLegend(<TbBuilding />, "Enter Plot Details ")}>
+        <Fieldset legend={fieldLegend(<TbBuilding />, "Enter Building Details ")}>
           {fields.map((field) => (
             <NumberInput
+              allowNegative={false}
+              error={invalidInput && values[field.name] === 0 ? 'Number cannot be empty or zero' : undefined}
               suffix={field.name === 'noOfFloors' ? '' : values.unit === 'Feet' ? ' ft' : ' m'}
               key={field.name}
               label={field.label}
@@ -292,17 +322,44 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
               }
             />
           ))}
+          <Autocomplete
+          type="number"
+          prefix="$"
+          value={rate.toString() === "" ? "" : rate.toString()}
+          rightSection={
+                          rate !== 0 && (
+                            <CloseButton onClick={() => setRate(0)} />
+                          )
+                        }
+            error={invalidInput && rate < 450 ? 'Number cannot be empty or less than 450' : undefined}
+            label={<Flex align="center" gap={5}> <Text size="sm">Construction Rate ($/m<sup>2</sup>)</Text><HoverCard width={isMobile? '50%': '20%'} shadow="md" withArrow position="top">
+              <HoverCard.Target> 
+                <ThemeIcon size="xs" variant="outline" color="yellow" bd={0}>
+                  <TbAlertCircle size={16} />
+                </ThemeIcon>
+              </HoverCard.Target>
+              <HoverCard.Dropdown>
+                <Text size="sm" fw={700}>Note:</Text>
+                <Text size="sm">
+                  The Options of Construction Rate are based in Phnom Penh City, Cambodia. if the rate in your region is different, please input your own rate.
+                </Text>
+              </HoverCard.Dropdown>
+            </HoverCard></Flex> }
+            placeholder="Enter Construction Rate"
+            data={["$450 (Normal Rate)", "$600 (Good Rate)", "$750 (Excellent Rate)"]}
+            onChange={(value) => handleSelectChange('constructionRate', value)}
+          />
         </Fieldset>
         <Flex gap="md" direction={'row-reverse'} align={"center"}>
 
 <Button 
-  size="md"
+  size="sm"
   onClick={handleCalculate}
   loading={isSubmitting}
   disabled={isSubmitting}
-
-  variant="outline"
-  rightSection={<TbArrowRight />}
+  variant="gradient"
+  gradient={{ from: 'orange', to: 'yellow.9' }}
+  rightSection={<TbArrowDown />}
 >
   Calculate
 </Button>
@@ -326,9 +383,9 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
 </Text>
 )}
         <Text size="xl" fw={700}>
-          Calculation Cost
+          Cost Calculation
         </Text>
-        <SegmentedControl
+        {/* <SegmentedControl
           value={values.currency}
           onChange={(value) => handleSelectChange('currency', value)}
           data={[
@@ -336,7 +393,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             { label: (<Flex align={'center'} justify={'center'} gap={5}><FaEuroSign /><Text>EURO</Text></Flex>), value: 'EUR' },
             { label: (<Flex align={'center'} justify={'center'} gap={5}><FaPoundSign /><Text>GBP</Text></Flex>), value: 'GBP' },
           ]}
-        />
+        /> */}
         <NumberInput
           label="Gross Floor Area"
           value={calculatedValues.grossFloorArea}
@@ -351,8 +408,13 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             readOnly
           />
           <TextInput
-            label="Estimate Architecture Work & Interior Finishes Cost (≈50% of ECC)"
+            label="Estimate Architecture Work (≈30% of ECC)"
             value={formatCurrency(calculatedValues.archiCost)}
+            readOnly
+          />
+          <TextInput
+            label="Estimate Interior Finishes Cost (≈20% of ECC)"
+            value={formatCurrency(calculatedValues.interiorCost)}
             readOnly
           />
           <TextInput
