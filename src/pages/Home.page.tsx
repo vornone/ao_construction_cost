@@ -1,13 +1,23 @@
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { Welcome } from '../components/Welcome/Welcome';
-import { AppShell, Burger, Flex, Input, Stack,Center, Image, BackgroundImage } from '@mantine/core';
+import { AppShell, Burger, Flex, Input, Stack,Center, Image, BackgroundImage, Tabs, TabsPanel, Box } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Text } from '@mantine/core';
 import ConstructionCostForm from '@/components/ConstructionCostForm/ConstructionCostForm';
 import { useMediaQuery } from '@mantine/hooks';
 import { FooterCentered } from '@/components/PageComponents/Footer/Footer';
 
-
+const tabsValue = [
+  {
+    tab_number: 'tab1',
+    tab_title: 'New Building Cost'},
+  {
+    tab_number: 'tab2',
+    tab_title: 'Building Renovation Cost'},
+  {
+    tab_number: 'tab3',
+    tab_title: 'Interior Decoration Cost'}
+]
 
 export function HomePage() {
   const [opened, { toggle }] = useDisclosure(false);
@@ -37,18 +47,23 @@ export function HomePage() {
           height={isMobile ? 30 : 40}
           alt="AO Construction Cost Logo"
         /> */}
-
         <Text size="xl" fw={700}>Keha Home </Text>
         <ColorSchemeToggle /></Flex>
-
       </AppShell.Header>
-
       <AppShell.Navbar p="md" >Coming Soon</AppShell.Navbar>
-          
       <AppShell.Main>
         <BackgroundImage src="./src/assets/heroImage.jpg" style={{width: '100%', height: '100%'}}></BackgroundImage>
         <Center><Welcome isMobile={isMobile}></Welcome></Center>
-        <ConstructionCostForm isMobile={isMobile}></ConstructionCostForm>
+        <Center>
+        <Tabs  w={isMobile ? '100%' : '70%'} variant='default' radius={'md'} bd={2} defaultValue={'tab1'} color='yellow'>
+          <Tabs.List grow justify='center' w={'100%'} > 
+            {tabsValue.map((tab) => (<Tabs.Tab key={tab.tab_number} value={tab.tab_number}><Text size="md">{tab.tab_title}</Text></Tabs.Tab>))}
+          </Tabs.List>
+          <Tabs.Panel value='tab1'><ConstructionCostForm isMobile={isMobile}></ConstructionCostForm></Tabs.Panel>
+          <Tabs.Panel value='tab2'><Center h={'50dvh'}> <Text size="xl" ta={'center'} fw={700}>coming soon...</Text></Center></Tabs.Panel>
+          <Tabs.Panel value='tab3'><Center h={'50dvh'}> <Text size="xl" ta={'center'} fw={700}>coming soon...</Text></Center></Tabs.Panel>
+        </Tabs>
+        </Center>
       </AppShell.Main>
       <AppShell.Footer pos={'sticky'}><FooterCentered/></AppShell.Footer>
     </AppShell>

@@ -1,20 +1,45 @@
 import { Anchor, Image, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import classes from './Welcome.module.css';
-
+import { Transition } from '@mantine/core';
+import { useState, useEffect } from 'react';
 interface Props {
   isMobile: boolean;
 }
 export function Welcome({ isMobile }: Props) {
+  const [mounted, setMounted] = useState(false);
+
+  // Set `mounted` to true when the component is mounted
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   return (
     <>
     <Stack>
-      <Title className={classes.title} ta="center" mt={'xl'}>
-        Welcome to{' '}
-        <br/> 
-        <Text inherit variant="gradient" component="span" gradient={{ from: 'orange', to: 'yellow.1' }}>
-          Keha Home
-        </Text>
-      </Title>
+    <Transition
+          mounted={mounted}
+          transition="fade-right"
+          duration={1000} // Transition duration in milliseconds
+          timingFunction="ease"
+        >
+          {(styles) => (
+            <Title
+              className={classes.title}
+              ta="center"
+              mt="xl"
+              style={styles} // Apply the transition styles
+            >
+              Welcome to <br />
+              <Text
+                inherit
+                variant="gradient"
+                component="span"
+                gradient={{ from: 'orange', to: 'yellow.1' }}
+              >
+                Keha Home
+              </Text>
+            </Title>
+          )}
+        </Transition>
 
       <Text c="dimmed" ta="center" size="md" maw={isMobile ? '100%' : '70%'} mx="auto" mb={50} >
 

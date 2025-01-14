@@ -53,6 +53,7 @@ interface CalculatedObject{
   finalConstructionCost: number;
 }
 
+
 function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -73,7 +74,21 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     email: "",
     phoneNumber: "",
   });
+  const percentageField =[
+  {
+    value: "450",
+    structure: 0.3333,
+    archi:0.4667,
+    MEP:0.2,
+  },
+  {
+    value: "750",
+    structure: 0.2933,
+    archi:0.5067,
+    MEP:0.2,
+  }
 
+]
 
   const [calculatedValues, setCalculatedValues] = useState<CalculatedObject>({
     grossFloorArea: 0,
@@ -93,12 +108,12 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   });
 
   useEffect(() => {
-    if (values.constructionRate !== "" && values.constructionRate === "$600 (Good Rate)") {
-      setRate(600);
-    } else if (values.constructionRate !== "" && values.constructionRate === "$450 (Normal Rate)") {
+    if (values.constructionRate !== "" && values.constructionRate === "$450 (Normal Rate)") {
       setRate(450);
-    } else if (values.constructionRate !== "" && values.constructionRate === "$750 (Excellent Rate)") {
+    } else if (values.constructionRate !== "" && values.constructionRate === "$750 (Good Rate)") {
       setRate(750);
+    } else if (values.constructionRate !== "" && values.constructionRate === "$970 (Excellent Rate)") {
+      setRate(970);
     }else if (!isNaN(Number(values.constructionRate))) {
       setRate(Number(values.constructionRate));
     }else if (!isNaN(Number(values.constructionRate)) && values.constructionRate !== "") {
@@ -177,7 +192,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     const designMEPCost = designCost.calculateMEPCost(totalConstructionCost);
     const totalDesignBuild = designCost.totalDesignCost(totalDesignCost, engineerCost, designMEPCost);
     //Total Cost
-    const fullBudgetDesignBuild= totalCost.fullBudgetDesignBuild(totalConstructionCost, totalDesignBuild);
+    const fullBudgetDesignBuild= totalCost.fullBudgetDesignBuild(totalConstructionCost, 0);
     const permitFee = totalCost.permitFee(fullBudgetDesignBuild);
     const contingencyCashReserve = totalCost.contingencyCashReserve(fullBudgetDesignBuild);
     const finalConstructionCost = fullBudgetDesignBuild+ permitFee + contingencyCashReserve;
@@ -263,7 +278,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   return (
     <Stack w="100%" align="center">
       <ToastContainer />
-      <Stack w={isMobile ? '100%' : '70%'} pos="relative">
+      <Stack w={isMobile ? '100%' : '100%'} pos="relative">
         {showNotification && (
           <Notification
             title="Success"
@@ -277,7 +292,6 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             </Flex>
           </Notification>
         )}
-
         {/* <Select
           data={unit}
           label="Select Unit"
@@ -288,21 +302,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
         <Text size="xl" fw={700}>
           Construction Cost Form
         </Text>
-        <Fieldset legend={fieldLegend(<TbUser />, "Enter User Details (optional)")}>
-          <TextInput
-    
-            label="Email"
-            placeholder="Enter Email"
-            value={userInput.email}
-            onChange={(event) => setUserInput({ ...userInput, email: event.target.value })}
-          />
-          <TextInput
-            label="Phone Number"  
-            placeholder="Enter Phone Number"
-            value={userInput.phoneNumber}
-            onChange={(event) => setUserInput({ ...userInput, phoneNumber: event.target.value })}
-          />
-        </Fieldset>
+        
         <Fieldset legend={fieldLegend(<TbBuilding />, "Enter Building Details ")}>
           {fields.map((field) => (
             <NumberInput
@@ -346,7 +346,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
               </HoverCard.Dropdown>
             </HoverCard></Flex> }
             placeholder="Enter Construction Rate"
-            data={["$450 (Normal Rate)", "$600 (Good Rate)", "$750 (Excellent Rate)"]}
+            data={["$450 (Normal Rate)", "$750 (Good Rate)", "$970 (Excellent Rate)"]}
             onChange={(value) => handleSelectChange('constructionRate', value)}
           />
         </Fieldset>
@@ -396,29 +396,29 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
         /> */}
         <NumberInput
           label="Gross Floor Area"
-          value={calculatedValues.grossFloorArea}
+          value={calculatedValues.grossFloorArea.toFixed(2)}
           readOnly
           suffix={values.unit === 'Feet' ? ' sqft' : ' sqm'}
         
         />
         <Fieldset legend={fieldLegend(<MdConstruction />, "Construction Cost")}>
           <TextInput
-            label="Estimate Structure Cost(≈30% of ECC)"
+            label="Estimate Structure Cost"
             value={formatCurrency(calculatedValues.structureCost)}
             readOnly
           />
           <TextInput
-            label="Estimate Architecture Work (≈30% of ECC)"
+            label="Estimate Architecture Work "
             value={formatCurrency(calculatedValues.archiCost)}
             readOnly
           />
           <TextInput
-            label="Estimate Interior Finishes Cost (≈20% of ECC)"
+            label="Estimate Interior Finishes Cost "
             value={formatCurrency(calculatedValues.interiorCost)}
             readOnly
           />
           <TextInput
-            label="Estimate MEP Cost (≈20% of ECC)"
+            label="Estimate MEP Cost "
             value={formatCurrency(calculatedValues.MEPcost)}
             readOnly
           />
@@ -430,7 +430,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             readOnly
           />
           </Fieldset>
-          <Fieldset legend={fieldLegend(<MdDesignServices />, "Design Cost")}>
+          {/* <Fieldset legend={fieldLegend(<MdDesignServices />, "Design Cost")}>
           <TextInput
             label="Building Design Cost (7% of ECC)"
             value={formatCurrency(calculatedValues.totalDesignCost)}
@@ -454,13 +454,13 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             value={formatCurrency(calculatedValues.totalDesignBuild)}
             readOnly
           />
-          </Fieldset>
-          <Fieldset legend={fieldLegend(<FaMoneyBills />, "Estimated Budget for Full Design and Build")}>
-          <TextInput
+          </Fieldset> */}
+          <Fieldset legend={fieldLegend(<FaMoneyBills />, "Estimated Miscellaneous and Cash Reserve")}>
+          {/* <TextInput
             label="Full Budget Design and Build"
             value={formatCurrency(calculatedValues.fullBudgetDesignBuild)}
             readOnly
-          />
+          /> */}
           <TextInput
             label="Permit Fee, Licences Fee, Admisnistration & Insurance"
             value={formatCurrency(calculatedValues.permitFee)}
@@ -474,6 +474,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
 
           </Fieldset>
         <TextInput
+          ml={25}
           label="Total Project Cost"
           size="xl"
           fw={800}
@@ -481,7 +482,23 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           value={"≈ " + formatCurrency(calculatedValues.finalConstructionCost)}
           readOnly
         />
- 
+ <Fieldset legend={fieldLegend(<TbUser />, "Enter User Details (optional)")} >
+          <TextInput
+    
+            label="Email"
+            placeholder="Enter Email"
+            value={userInput.email}
+            onChange={(event) => setUserInput({ ...userInput, email: event.target.value })}
+          />
+          <TextInput
+            label="Phone Number"  
+            placeholder="Enter Phone Number"
+            value={userInput.phoneNumber}
+            onChange={(event) => setUserInput({ ...userInput, phoneNumber: event.target.value })}
+          />
+          <Flex justify={'flex-end'} pt={10}>          <Button>Submit</Button></Flex>
+
+        </Fieldset>
       </Stack>
 
     </Stack>
