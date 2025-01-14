@@ -5,6 +5,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { Text } from '@mantine/core';
 import ConstructionCostForm from '@/components/ConstructionCostForm/ConstructionCostForm';
 import { useMediaQuery } from '@mantine/hooks';
+import { FooterCentered } from '@/components/PageComponents/Footer/Footer';
+
+
+
 export function HomePage() {
   const [opened, { toggle }] = useDisclosure(false);
   const isMobile = useMediaQuery('(max-width: 600px)')?? false;
@@ -46,6 +50,7 @@ export function HomePage() {
         <Center><Welcome isMobile={isMobile}></Welcome></Center>
         <ConstructionCostForm isMobile={isMobile}></ConstructionCostForm>
       </AppShell.Main>
+      <AppShell.Footer pos={'sticky'}><FooterCentered/></AppShell.Footer>
     </AppShell>
   );
 }

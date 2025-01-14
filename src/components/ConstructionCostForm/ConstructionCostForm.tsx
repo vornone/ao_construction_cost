@@ -42,6 +42,7 @@ interface CalculatedObject{
   structureCost: number;
   archiCost: number;
   MEPcost: number;
+  interiorCost: number;
   totalDesignCost: number;
   engineerCost: number;
   designMEPCost: number;
@@ -79,6 +80,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     totalConstructionCost: 0,
     structureCost: 0,
     archiCost: 0,
+    interiorCost: 0,
     MEPcost: 0,
     totalDesignCost: 0,
     engineerCost: 0,
@@ -168,6 +170,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     const structureCost = constructionCost.calculateStructureCost(totalConstructionCost);
     const archiCost = constructionCost.calculateArchiCost(totalConstructionCost);
     const MEPcost = constructionCost.calculateMEPCost(totalConstructionCost);
+    const interiorCost = constructionCost.calculateInteriorCost(totalConstructionCost);
     //Design Cost
     const totalDesignCost = designCost.calculateDesignCost(totalConstructionCost);
     const engineerCost = designCost.calculateEngineerCost(totalConstructionCost);
@@ -185,6 +188,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
       structureCost,
       archiCost,
       MEPcost,
+      interiorCost,
       totalDesignCost,
       engineerCost,
       designMEPCost,
@@ -259,7 +263,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   return (
     <Stack w="100%" align="center">
       <ToastContainer />
-      <Stack w={isMobile ? '100%' : '60%'} pos="relative">
+      <Stack w={isMobile ? '100%' : '70%'} pos="relative">
         {showNotification && (
           <Notification
             title="Success"
@@ -274,13 +278,13 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           </Notification>
         )}
 
-        <Select
+        {/* <Select
           data={unit}
           label="Select Unit"
           placeholder="Select Unit"
           value={values.unit}
           onChange={(value) => handleSelectChange('unit', value)}
-        />
+        /> */}
         <Text size="xl" fw={700}>
           Construction Cost Form
         </Text>
@@ -415,7 +419,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           />
           <TextInput
             label="Estimate MEP Cost (≈20% of ECC)"
-            value={formatCurrency(calculatedValues.MEPCost)}
+            value={formatCurrency(calculatedValues.MEPcost)}
             readOnly
           />
           <TextInput
