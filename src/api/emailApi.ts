@@ -6,12 +6,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 
 
 const senderInfo = {
-    email: 'vpanhavorn71@gmail.com',
-    password: 'some1hour',
+    email: process.env.EMAIL_USER,
+    password: process.env.EMAIL_PASSWORD,
 }
 
 
@@ -32,7 +32,7 @@ app.post('/send-email', async (req: Request, res: Response) => {
   const { email, name, message } = req.body;
   try {
     const mailOptions = {
-      from: `${senderInfo.email}`,
+      from: 'your-email@gmail.com',
       to: 'recipient-email@example.com',
       subject: `Message from ${name}`,
       text: `You have a new message from ${name} (${email}): \n\n${message}`,
