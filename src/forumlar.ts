@@ -14,17 +14,17 @@ export class ConstructionCost {
         return this.calculateArea(params) * params.constructionRate;
     }
     
-    calculateStructureCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.3;
+    calculateStructureCost(constructionTotalCost: number, percentage: number) {
+        return constructionTotalCost * percentage;
     }
-    calculateArchiCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.3;
+    calculateArchiCost(constructionTotalCost: number,percentage: number) {
+        return constructionTotalCost * percentage;
     }
-    calculateInteriorCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.2;
+    calculateInteriorCost(constructionTotalCost: number, percentage: number) {
+        return constructionTotalCost * percentage;
     }
-    calculateMEPCost(constructionTotalCost: number) {
-        return constructionTotalCost * 0.2;
+    calculateMEPCost(constructionTotalCost: number, percentage: number) {
+        return constructionTotalCost * percentage;
     }
 }
 
@@ -54,3 +54,4 @@ export class TotalCost{
         return fullBudgetDesignBuild*0.05;
     }
 }
+
