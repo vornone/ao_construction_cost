@@ -4,7 +4,6 @@ import { FaMoneyBills } from 'react-icons/fa6';
 import { MdConstruction, MdDesignServices, MdEuro } from 'react-icons/md';
 import { TbAlertCircle, TbArrowDown, TbArrowRight, TbBuilding, TbUser } from 'react-icons/tb';
 import { toast, ToastContainer } from 'react-toastify';
-import {Form, useForm} from '@mantine/form';
 import {
   Alert,
   Autocomplete,
@@ -24,9 +23,10 @@ import {
   ThemeIcon,
   Tooltip,
 } from '@mantine/core';
+import { Form, useForm } from '@mantine/form';
 import { ConstructionCost, DesignCost, TotalCost } from '../../forumlar';
 import NumberSelector from './../NumberSelector/NumberSelector';
-
+import emailjs from 'emailjs-com';
 const designCost = new DesignCost();
 const constructionCost = new ConstructionCost();
 const totalCost = new TotalCost();
@@ -78,7 +78,7 @@ const percentageField = [
   {
     value: '750',
     structure: 0.29,
-    archi: 0.50,
+    archi: 0.5,
     MEP: 0.21,
   },
   {
@@ -89,9 +89,9 @@ const percentageField = [
   },
   {
     value: 'other',
-    structure: 0.30,
-    archi: 0.50,
-    MEP: 0.20,
+    structure: 0.3,
+    archi: 0.5,
+    MEP: 0.2,
   },
 ];
 function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
@@ -130,7 +130,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     email: '',
     phoneNumber: '',
   });
-  
+
   const form = useForm({
     initialValues: {
       email: '',
@@ -245,7 +245,6 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     const permitFee = totalCost.permitFee(fullBudgetDesignBuild);
     const contingencyCashReserve = totalCost.contingencyCashReserve(fullBudgetDesignBuild);
     const finalConstructionCost = fullBudgetDesignBuild + permitFee + contingencyCashReserve;
-
     return {
       grossFloorArea,
       totalConstructionCost,
@@ -284,11 +283,70 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
       }
     }
   };
-  const handleSubmit = (values: any) => {
-    console.log('Form values:', values);
-    // Perform your logic here
+
+  const handleSubmit = async (userInput:UserInput) => {
+    setSubmitError(null);
+    if(calculatedValues.finalConstructionCost === 0){
+      toast.error('please do the calculation before submitting');
+      setInvalidInput(true);
+      return
+    }
+    try {
+      const templateParams = {
+        to_email: userInput.email,
+        phone_number: userInput.phoneNumber,
+        gross_floor_area: calculatedValues.grossFloorArea,
+        total_construction_cost: calculatedValues.totalConstructionCost,
+        permit_fee: calculatedValues.permitFee,
+        contingency_reserve: calculatedValues.contingencyCashReserve,
+        final_cost: calculatedValues.finalConstructionCost,
+        from_name: "Keha Team",
+        message:`
+        email: ${form.values.email}
+        phone number: ${form.values.phoneNumber}
+        Building Width: ${values.plotWidth} Meter
+        Building Length: ${values.plotLength} Meter
+        No. of Floors: ${values.noOfFloors}
+        Construction Rate: ${rate} $
+        Gross Floor Area: ${calculatedValues.grossFloorArea} sqm
+        Total Construction Cost: ${calculatedValues.totalConstructionCost}$
+        Permit Fee: ${calculatedValues.permitFee}$
+        Contingency Cash Reserve: ${calculatedValues.contingencyCashReserve}$
+        Final Cost: ${calculatedValues.finalConstructionCost}$
+        
+        `,
+      };
+
+      const response = await emailjs.send(
+        'service_shtl94g',
+        'template_5m7m3oi',
+        templateParams,
+        '_IXciVI8-bRIgu3FM'
+      );
+
+      if (response.status === 200) {
+        setShowNotification(true);
+        toast.success('Cost estimate sent successfully!');
+        form.reset();
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setSubmitError('Failed to send email. Please try again.');
+      toast.error('Failed to send email. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-  
+  const handleUserChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    console.log(`Updating ${name} with value: ${value}`);
+    
+    setUserInput((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
     <Stack w="100%" align="center">
       <ToastContainer />
@@ -367,20 +425,20 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             data={['$450 (Normal Rate)', '$750 (Good Rate)', '$970 (Excellent Rate)']}
             onChange={(value) => handleSelectChange('constructionRate', value)}
           />
-          <Flex gap="md" direction={'row-reverse'} align={'center'}  pt={10}>
-          <Button
-            size="sm"
-            onClick={handleCalculate}
-            loading={isSubmitting}
-            disabled={isSubmitting}
-            variant="filled"
-            color='yellow.9'
-            rightSection={<TbArrowDown />}
-            radius={'lg'}
-          >
-            Calculate
-          </Button>
-        </Flex>
+          <Flex gap="md" direction={'row-reverse'} align={'center'} pt={10}>
+            <Button
+              size="sm"
+              onClick={handleCalculate}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              variant="filled"
+              color="yellow.9"
+              rightSection={<TbArrowDown />}
+              radius={'lg'}
+            >
+              Calculate
+            </Button>
+          </Flex>
         </Fieldset>
 
         {submitError && (
@@ -446,29 +504,39 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           readOnly
         />
         <Fieldset legend={fieldLegend(<TbUser />, 'Enter User Details (optional)')}>
-        <form  onSubmit={form.onSubmit((values) => {
-        handleSubmit(values);
-      })}>
-          <TextInput
-            label="Email"
-            placeholder="Enter Email"
-            value={userInput.email}
-            {...form.getInputProps('email',{onChange:(event: React.ChangeEvent<HTMLInputElement>) => setUserInput({ ...userInput, email: event.target.value })})}
-            key={form.key('email')}
-            {...form.getInputProps('email')}
-          />
-          <TextInput
-            type="number"
-            label="Phone Number"
-            placeholder="Enter Phone Number"
-            value={userInput.phoneNumber}
-            key={form.key('phoneNumber')}
-            {...form.getInputProps('phoneNumber',{onChange:(event: React.ChangeEvent<HTMLInputElement>) => setUserInput({ ...userInput, phoneNumber: event.target.value })})}
-          />
-
-          <Group justify={'flex-end'} pt={10}>
-            <Button size="sm" variant="filled" color='yellow.9' rightSection={<TbArrowRight />} radius={'lg'} type='submit'>Submit</Button>
-          </Group>
+        <form  onSubmit={form.onSubmit(() => handleSubmit(userInput))}>
+            <TextInput
+              label="Email"
+              placeholder="Enter Email"
+              value={userInput.email}
+              {...form.getInputProps('email', {
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                  setUserInput({ ...userInput, email: event.target.value }),
+              })}
+              key={form.key('email')}
+              {...form.getInputProps('email')}
+            />
+            <TextInput
+              type="number"
+              label="Phone Number"
+              placeholder="Enter Phone Number"
+              value={userInput.phoneNumber}
+              key={form.key('phoneNumber')}
+              {...form.getInputProps('phoneNumber', {
+                onChange: {handleUserChange}} )}
+            />
+            <Group justify={'flex-end'} pt={10}>
+              <Button
+                size="sm"
+                variant="filled"
+                color="yellow.9"
+                rightSection={<TbArrowRight />}
+                radius={'lg'}
+                type="submit"
+              >
+                Submit
+              </Button>
+            </Group>
           </form>
         </Fieldset>
       </Stack>

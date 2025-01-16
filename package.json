@@ -5,7 +5,6 @@
   "version": "0.0.0",
   "homepage": "https://vornone.github.io/ao_construction_cost/",
   "scripts": {
-    "start": "ts-node src/api/emailApi.ts",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "dev": "vite",
@@ -29,6 +28,7 @@
     "@mantine/hooks": "7.15.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "emailjs-com": "^3.2.0",
     "express": "^4.21.2",
     "googleapis": "^144.0.0",
     "icons-react": "^3.7.1",
