@@ -7,7 +7,6 @@ interface Props {
 }
 export function Welcome({ isMobile }: Props) {
   const [mounted, setMounted] = useState(false);
-
   // Set `mounted` to true when the component is mounted
   useEffect(() => {
     setMounted(true);

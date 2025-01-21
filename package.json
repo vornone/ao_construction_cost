@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "0.0.0",
-  "homepage": "https://vornone.github.io/ao_construction_cost/",
+  "homepage": "https://kehahome.aoarchitectsdesign.com/",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",

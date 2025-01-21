@@ -7,7 +7,7 @@ const router = createBrowserRouter([
     element: <HomePage />,
   },
 ], {
-  basename: '/ao_construction_cost'  // Always use this basename
+  basename: '/'  // Always use this basename
 });
 
 export function Router() {

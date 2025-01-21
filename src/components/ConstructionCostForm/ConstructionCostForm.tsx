@@ -27,6 +27,8 @@ import { Form, useForm } from '@mantine/form';
 import { ConstructionCost, DesignCost, TotalCost } from '../../forumlar';
 import NumberSelector from './../NumberSelector/NumberSelector';
 import emailjs from 'emailjs-com';
+import { useMantineColorScheme } from '@mantine/core';
+
 const designCost = new DesignCost();
 const constructionCost = new ConstructionCost();
 const totalCost = new TotalCost();
@@ -95,6 +97,7 @@ const percentageField = [
   },
 ];
 function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
+  const { colorScheme } = useMantineColorScheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showNotification, setShowNotification] = useState(false);
@@ -199,8 +202,6 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     { label: 'No. of Floors', name: 'noOfFloors' as const },
   ];
 
-  const currencyList = ['USD', 'EUR', 'GBP'];
-  const unit = ['Meter', 'Feet'];
 
   const fieldLegend = (icon: React.ReactNode, Title: string) => {
     return (
@@ -293,13 +294,17 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
     }
     try {
       const templateParams = {
-        to_email: userInput.email,
-        phone_number: userInput.phoneNumber,
+        to_email: form.values.email,
+        phone_number: form.values.phoneNumber,
+        building_width: values.plotWidth,
+        building_length: values.plotLength,
+        no_of_floors: values.noOfFloors,
+        construction_rate: rate,
         gross_floor_area: calculatedValues.grossFloorArea,
-        total_construction_cost: calculatedValues.totalConstructionCost,
-        permit_fee: calculatedValues.permitFee,
-        contingency_reserve: calculatedValues.contingencyCashReserve,
-        final_cost: calculatedValues.finalConstructionCost,
+        total_construction_cost: formatCurrency(calculatedValues.totalConstructionCost),
+        permit_fee: formatCurrency(calculatedValues.permitFee),
+        contingency_reserve: formatCurrency(calculatedValues.contingencyCashReserve),
+        final_cost: formatCurrency(calculatedValues.finalConstructionCost),
         from_name: "Keha Team",
         message:`
         email: ${form.values.email}
@@ -349,25 +354,11 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
 
   return (
     <Stack w="100%" align="center">
-      <ToastContainer />
+      <ToastContainer  theme={colorScheme === 'dark' ? 'dark' : 'light'}/>
       <Stack w={isMobile ? '100%' : '100%'} pos="relative">
-        {showNotification && (
-          <Notification
-            title="Success"
-            color="green"
-            onClose={() => setShowNotification(false)}
-            style={{ position: 'absolute', top: 0, right: 0, zIndex: 1000 }}
-          >
-            <Flex align="center" gap={8}>
-              <FaCheck />
-              <Text>Form submitted successfully!</Text>
-            </Flex>
-          </Notification>
-        )}
         <Text size="xl" fw={700}>
           Construction Cost Form
         </Text>
-
         <Fieldset legend={fieldLegend(<TbBuilding />, 'Enter Building Details ')}>
           {fields.map((field) => (
             <NumberInput
@@ -377,6 +368,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
                   ? 'Number cannot be empty or zero'
                   : undefined
               }
+              allowDecimal={field.name !== 'noOfFloors'}
               suffix={field.name === 'noOfFloors' ? '' : values.unit === 'Feet' ? ' ft' : ' m'}
               key={field.name}
               label={field.label}
