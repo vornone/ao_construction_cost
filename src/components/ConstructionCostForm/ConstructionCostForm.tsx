@@ -4,6 +4,8 @@ import { FaMoneyBills } from 'react-icons/fa6';
 import { MdConstruction, MdDesignServices, MdEuro } from 'react-icons/md';
 import { TbAlertCircle, TbArrowDown, TbArrowRight, TbBuilding, TbUser } from 'react-icons/tb';
 import { toast, ToastContainer } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 import {
   Alert,
   Autocomplete,
@@ -105,6 +107,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
   const [rate, setRate] = useState(0);
   const [invalidInput, setInvalidInput] = useState(false);
   const [percentage, setPercentage] = useState({ structure: 0.3333, archi: 0.4667, MEP: 0.2 });
+  const { t } = useTranslation();
   const [values, setValues] = useState<FormValues>({
     plotWidth: 0,
     plotLength: 0,
@@ -359,7 +362,8 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
         <Text size="xl" fw={700}>
           Construction Cost Form
         </Text>
-        <Fieldset legend={fieldLegend(<TbBuilding />, 'Enter Building Details ')}>
+        <Fieldset legend={fieldLegend(<TbBuilding />, t("enterBuildingDetails"))}>
+        <Stack>
           {fields.map((field) => (
             <NumberInput
               allowNegative={false}
@@ -371,7 +375,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
               allowDecimal={field.name !== 'noOfFloors'}
               suffix={field.name === 'noOfFloors' ? '' : values.unit === 'Feet' ? ' ft' : ' m'}
               key={field.name}
-              label={field.label}
+              label={t(field.name)}
               placeholder={`Enter ${field.label}`}
               value={values[field.name] === 0 ? '' : values[field.name]}
               onChange={(value) => handleNumberChange(field.name, value ? Number(value) : 0)}
@@ -381,6 +385,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
               }
             />
           ))}
+
           <Autocomplete
             type="number"
             prefix="$"
@@ -393,7 +398,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
               <Flex align="center" gap={5}>
                 {' '}
                 <Text size="sm">
-                  Construction Rate ($/m<sup>2</sup>)
+                  {t('constructionRate')} ($/m<sup>2</sup>)
                 </Text>
                 <HoverCard width={isMobile ? '50%' : '20%'} shadow="md" withArrow position="top">
                   <HoverCard.Target>
@@ -428,9 +433,10 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
               rightSection={<TbArrowDown />}
               radius={'lg'}
             >
-              Calculate
+              {t('calculate')}
             </Button>
           </Flex>
+          </Stack>
         </Fieldset>
 
         {submitError && (
@@ -442,63 +448,68 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           Cost Calculation
         </Text>
 
-        <NumberInput
-          label="Gross Floor Area"
+
+        <Fieldset legend={fieldLegend(<MdConstruction />, t('constructionCost'))} >
+          <Stack>
+          <NumberInput
+          label={t('grossFloorArea')}
           value={calculatedValues.grossFloorArea.toFixed(2)}
           readOnly
           suffix={values.unit === 'Feet' ? ' sqft' : ' sqm'}
         />
-        <Fieldset legend={fieldLegend(<MdConstruction />, 'Construction Cost')}>
           <TextInput
-            label="Estimate Structure Cost"
+            label={t('structureCost')}
             value={formatCurrency(calculatedValues.structureCost)}
             readOnly
           />
           <TextInput
-            label="Estimate Architecture Work "
+            label={t('archiCost')}
             value={formatCurrency(calculatedValues.archiCost)}
             readOnly
           />
           <TextInput
-            label="Estimate MEP Cost "
+            label={t('MEPCost')}
             value={formatCurrency(calculatedValues.MEPcost)}
             readOnly
           />
           <TextInput
             fw={800}
             variant="unstyled"
-            label="Estimate Total Construction Cost"
+            label={t('totalConstructionCost')}
             value={formatCurrency(calculatedValues.totalConstructionCost)}
             readOnly
           />
+          </Stack>
         </Fieldset>
         <Fieldset
-          legend={fieldLegend(<FaMoneyBills />, 'Estimated Miscellaneous and Cash Reserve')}
+          legend={fieldLegend(<FaMoneyBills />, t('miscellaneousCashReserve'))}
         >
+          <Stack>
           <TextInput
-            label="Permit Fee, Licences Fee, Admisnistration & Insurance"
+            label={t('permitFee')}
             value={formatCurrency(calculatedValues.permitFee)}
             readOnly
           />
           <TextInput
-            label="Contingency Cash Reserve"
+            label={t('contingencyCashReserve')}
             value={formatCurrency(calculatedValues.contingencyCashReserve)}
             readOnly
-          />
+          /></Stack>
         </Fieldset>
         <TextInput
           ml={25}
-          label="Total Project Cost"
+          label={t('finalConstructionCost')}
           size="xl"
           fw={800}
           variant="unstyled"
           value={'≈ ' + formatCurrency(calculatedValues.finalConstructionCost)}
           readOnly
         />
-        <Fieldset legend={fieldLegend(<TbUser />, 'Enter User Details (optional)')}>
+        <Fieldset legend={fieldLegend(<TbUser />, t('enterUserDetails'))}>
         <form  onSubmit={form.onSubmit(() => handleSubmit(userInput))}>
+          <Stack>
             <TextInput
-              label="Email"
+              label={t('email')}
               placeholder="Enter Email"
               value={userInput.email}
               {...form.getInputProps('email', {
@@ -510,7 +521,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             />
             <TextInput
               type="number"
-              label="Phone Number"
+              label={t('phoneNumber')}
               placeholder="Enter Phone Number"
               value={userInput.phoneNumber}
               key={form.key('phoneNumber')}
@@ -526,9 +537,10 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
                 radius={'lg'}
                 type="submit"
               >
-                Submit
+                {t('submit')}
               </Button>
             </Group>
+            </Stack>
           </form>
         </Fieldset>
       </Stack>

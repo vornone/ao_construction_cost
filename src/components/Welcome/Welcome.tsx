@@ -13,7 +13,7 @@ export function Welcome({ isMobile }: Props) {
   }, []);
   return (
     <>
-    <Stack>
+    <Stack >
     <Transition
           mounted={mounted}
           transition="fade-right"

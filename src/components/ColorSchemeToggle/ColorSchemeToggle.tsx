@@ -6,7 +6,7 @@ export function ColorSchemeToggle() {
   const { setColorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
   const sunIcon = <TbSun size={18} color={theme.colors.yellow[6]}/>;
-  const moonIcon = <TbMoon size={18} color={theme.colors.blue[6]}/>;
+  const moonIcon = <TbMoon size={18} color={theme.colors.yellow[6]}/>;
   return (
       <Switch
         size='md'

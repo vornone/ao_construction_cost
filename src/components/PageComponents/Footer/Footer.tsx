@@ -1,16 +1,13 @@
 
-import { TbBrandInstagram, TbBrandTwitter, TbBrandYoutube, TbBrandLinkedin, TbBrandFacebook } from 'react-icons/tb';
-import { ActionIcon, Anchor, Group } from '@mantine/core';
+import { TbBrandInstagram, TbBrandTwitter, TbBrandYoutube, TbBrandLinkedin, TbBrandFacebook, TbBrandTiktok } from 'react-icons/tb';
+import { ActionIcon, Anchor, Group, Text } from '@mantine/core';
 import classes from './FooterCentered.module.css';
-const links = [
-  { link: '#', label: 'Contact' },
-  { link: '#', label: 'Privacy' },
-  { link: '#', label: 'Blog' },
-  { link: '#', label: 'Store' },
-  { link: '#', label: 'Careers' },
-];
-
 export function FooterCentered() {
+
+  const links = [
+    { link: 'https://www.instagram.com/keha.interior/', label: 'instagram' },
+    { link: 'https://www.facebook.com/keha.decor.idea', label: 'facebook' },
+  ];
   const items = links.map((link) => (
     <Anchor
       c="dimmed"
@@ -31,15 +28,23 @@ export function FooterCentered() {
         {/* <Group className={classes.links}>{items}</Group> */}
 
         <Group gap="xs" justify="flex-end"  wrap="nowrap">
-          <ActionIcon size="lg" variant="default" radius="xl">
-            <TbBrandLinkedin size={18} />
+          <ActionIcon size="lg" variant="default" radius="xl" onClick={() => window.open(links.find((link) => link.label === 'facebook')?.link, '_blank')}>
+            <TbBrandFacebook size={18} />
           </ActionIcon>
           <ActionIcon size="lg" variant="default" radius="xl">
-            <TbBrandYoutube size={18} />
+            <TbBrandTiktok size={18} />
           </ActionIcon>
-          <ActionIcon size="lg" variant="default" radius="xl">
-            <TbBrandInstagram size={18} />
+          <ActionIcon size="lg" variant="default" radius="xl" onClick={() => window.open(links.find((link) => link.label === 'instagram')?.link, '_blank')}>
+            <TbBrandInstagram size={18}  />
           </ActionIcon>
+        </Group>
+        <Group gap="xs" justify="flex-end"   p={10}>
+          <Text size="xs" c="dimmed">
+            Copyright © 2025
+          </Text>
+          <Text size="xs" c="dimmed" fw={700}>
+            Keha Home
+          </Text>
         </Group>
       </div>
     </div>

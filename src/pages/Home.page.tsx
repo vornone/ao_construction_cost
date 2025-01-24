@@ -1,27 +1,32 @@
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { Welcome } from '../components/Welcome/Welcome';
-import { AppShell, Burger, Flex, Input, Stack,Center, Image, BackgroundImage, Tabs, TabsPanel, Box } from '@mantine/core';
+import { AppShell, Burger, Flex, Input, Stack,Center, Image, BackgroundImage, Tabs, TabsPanel, Box, ThemeIcon } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Text } from '@mantine/core';
 import ConstructionCostForm from '@/components/ConstructionCostForm/ConstructionCostForm';
 import { useMediaQuery } from '@mantine/hooks';
 import { FooterCentered } from '@/components/PageComponents/Footer/Footer';
-
-const tabsValue = [
-  {
-    tab_number: 'tab1',
-    tab_title: 'New Building Cost'},
-  {
-    tab_number: 'tab2',
-    tab_title: 'Building Renovation Cost'},
-  {
-    tab_number: 'tab3',
-    tab_title: 'Interior Decoration Cost'}
-]
-
+import LanguagePicker from '@/components/LanguagePicker/LanguagePicker';
+import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
+import KehaLogo from '@/assets/logo/KehaLogo';
+import { useMantineColorScheme } from '@mantine/core';
 export function HomePage() {
   const [opened, { toggle }] = useDisclosure(false);
   const isMobile = useMediaQuery('(max-width: 600px)')?? false;
+  const { t } = useTranslation();
+  const { colorScheme: themeColorScheme, toggleColorScheme } = useMantineColorScheme();
+  const tabsValue = [
+    {
+      tab_number: 'tab1',
+      tab_title: t("newBuildingCost")},
+    {
+      tab_number: 'tab2',
+      tab_title: t('buildingRenovation')},
+    {
+      tab_number: 'tab3',
+      tab_title: t('interiorDecoration')},
+  ]
   return (
     <AppShell
       header={{ height: 60 }}
@@ -34,12 +39,12 @@ export function HomePage() {
     >
       <AppShell.Header >
         <Flex align="center" gap="md" justify={'space-between'} p={'sm'} w={'100%'}>
-          <Burger
+          {/* <Burger
           opened={opened}
           onClick={toggle}
           hiddenFrom="sm"
           size="sm"
-        />
+        /> */}
         {/* <Image 
         style={{'--svg-fill-color': 'var(--mantine-color-blue)'}}
           src="./src/assets/logo/AO_Construction_cost_logo_trim-01.svg" 
@@ -47,7 +52,10 @@ export function HomePage() {
           height={isMobile ? 30 : 40}
           alt="AO Construction Cost Logo"
         /> */}
-        <Text size="xl" fw={700}>Keha Home </Text>
+
+        <LanguagePicker></LanguagePicker>
+        <ThemeIcon w={isMobile ? 50 : 60}  variant="outline" color={themeColorScheme === 'dark' ? 'white' : 'gray.8'}  bd={0}><KehaLogo/></ThemeIcon>
+        {/* <Text size="xl" fw={700}>Keha Home </Text> */}
         <ColorSchemeToggle /></Flex>
       </AppShell.Header>
       <AppShell.Navbar p="md" >Coming Soon</AppShell.Navbar>
