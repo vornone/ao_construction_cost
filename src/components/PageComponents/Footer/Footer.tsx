@@ -40,7 +40,7 @@ export function FooterCentered() {
         </Group>
         <Group gap="xs" justify="flex-end"   p={10}>
           <Text size="xs" c="dimmed">
-            Copyright © 2025
+            Copyright © {new Date().getFullYear()}
           </Text>
           <Text size="xs" c="dimmed" fw={700}>
             Keha Home

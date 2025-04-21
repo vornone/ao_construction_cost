@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { FaCheck, FaDollarSign, FaEuroSign, FaPoundSign, FaTimes } from 'react-icons/fa';
 import { FaMoneyBills } from 'react-icons/fa6';
 import { MdConstruction, MdDesignServices, MdEuro } from 'react-icons/md';
 import { TbAlertCircle, TbArrowDown, TbArrowRight, TbBuilding, TbUser } from 'react-icons/tb';
@@ -7,7 +6,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import {
-  Alert,
   Autocomplete,
   Button,
   CloseButton,
@@ -15,19 +13,14 @@ import {
   Flex,
   Group,
   HoverCard,
-  Notification,
   NumberInput,
-  SegmentedControl,
-  Select,
   Stack,
   Text,
   TextInput,
   ThemeIcon,
-  Tooltip,
 } from '@mantine/core';
-import { Form, useForm } from '@mantine/form';
+import {useForm } from '@mantine/form';
 import { ConstructionCost, DesignCost, TotalCost } from '../../forumlar';
-import NumberSelector from './../NumberSelector/NumberSelector';
 import emailjs from 'emailjs-com';
 import { useMantineColorScheme } from '@mantine/core';
 
@@ -502,10 +495,10 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
           size="xl"
           fw={800}
           variant="unstyled"
-          value={'≈ ' + formatCurrency(calculatedValues.finalConstructionCost)}
+          value={'Est. ' + formatCurrency(calculatedValues.finalConstructionCost)}
           readOnly
         />
-        <Fieldset legend={fieldLegend(<TbUser />, t('enterUserDetails'))}>
+        {/* <Fieldset legend={fieldLegend(<TbUser />, t('enterUserDetails'))}>
         <form  onSubmit={form.onSubmit(() => handleSubmit(userInput))}>
           <Stack>
             <TextInput
@@ -542,7 +535,7 @@ function ConstructionCostForm({ isMobile }: { isMobile: boolean }) {
             </Group>
             </Stack>
           </form>
-        </Fieldset>
+        </Fieldset> */}
       </Stack>
     </Stack>
   );

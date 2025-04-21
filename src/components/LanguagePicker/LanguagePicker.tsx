@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Button, Switch, ThemeIcon } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { useLocalStorage } from "@mantine/hooks";
-import {FaLanguage} from 'react-icons/fa6'
 import LanguageIcon from "@/assets/logo/LanguageIcon";
 const LanguagePicker = () => {
   const { i18n } = useTranslation();

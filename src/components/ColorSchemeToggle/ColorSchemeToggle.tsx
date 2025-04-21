@@ -1,5 +1,5 @@
 
-import { Button, Group, useMantineColorScheme, useMantineTheme } from '@mantine/core';
+import {useMantineColorScheme, useMantineTheme } from '@mantine/core';
 import { Switch } from '@mantine/core';
 import { TbSun, TbMoon } from 'react-icons/tb';
 export function ColorSchemeToggle() {
